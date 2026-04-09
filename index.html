@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>BigText — Large Text Display</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Instrument+Sans:wght@400;700&display=swap" rel="stylesheet">
@@ -50,7 +50,7 @@
   #display-area {
     position: fixed; inset: 0;
     display: flex; align-items: center; justify-content: center;
-    padding: 40px;
+    padding: 24px;
     background: var(--bg);
     transition: background 0.4s ease;
     cursor: text;
@@ -58,21 +58,20 @@
   }
 
   #big-text {
-    width: 100%;
+    max-width: 100%;
     text-align: center;
     font-family: var(--font-display);
     font-weight: 700;
-    line-height: 1.1;
+    line-height: 1.08;
     color: var(--text);
     word-break: break-word;
     overflow-wrap: break-word;
+    white-space: pre-wrap;
     transition: color 0.4s ease;
     user-select: none;
   }
 
-  #big-text.placeholder {
-    opacity: 0.15;
-  }
+  #big-text.placeholder { opacity: 0.15; }
 
   /* ─── INPUT OVERLAY ─── */
   #input-overlay {
@@ -102,7 +101,6 @@
     max-width: 560px;
     animation: slideUp 0.3s ease;
   }
-
   .theme-light .input-card {
     background: rgba(255,255,255,0.97);
     border-color: rgba(0,0,0,0.08);
@@ -113,13 +111,19 @@
     font-size: 18px;
     font-weight: 700;
     color: var(--ui-text-bright);
-    margin-bottom: 18px;
+    margin-bottom: 4px;
     letter-spacing: -0.02em;
+  }
+  .input-hint {
+    font-size: 12px;
+    color: var(--ui-text);
+    margin-bottom: 14px;
+    opacity: 0.7;
   }
 
   .input-card textarea {
     width: 100%;
-    height: 120px;
+    height: 140px;
     background: var(--ui-bg);
     border: 1.5px solid var(--ui-border);
     border-radius: 12px;
@@ -131,12 +135,8 @@
     outline: none;
     transition: border-color 0.2s;
   }
-  .input-card textarea:focus {
-    border-color: var(--accent);
-  }
-  .input-card textarea::placeholder {
-    color: var(--ui-text);
-  }
+  .input-card textarea:focus { border-color: var(--accent); }
+  .input-card textarea::placeholder { color: var(--ui-text); }
 
   .input-actions {
     display: flex; gap: 10px;
@@ -154,17 +154,9 @@
     cursor: pointer;
     transition: all 0.15s ease;
   }
-
-  .btn-ghost {
-    background: var(--ui-bg);
-    color: var(--ui-text);
-  }
+  .btn-ghost { background: var(--ui-bg); color: var(--ui-text); }
   .btn-ghost:hover { background: var(--ui-bg-hover); color: var(--ui-text-bright); }
-
-  .btn-primary {
-    background: var(--accent);
-    color: #000;
-  }
+  .btn-primary { background: var(--accent); color: #000; }
   .btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); }
 
   /* ─── TOOLBAR ─── */
@@ -182,7 +174,6 @@
     z-index: 50;
     transition: opacity 0.3s, transform 0.3s;
   }
-
   #toolbar.hidden {
     opacity: 0;
     transform: translateX(-50%) translateY(20px);
@@ -205,14 +196,9 @@
   }
   .tool-btn:hover { background: var(--ui-bg-hover); color: var(--ui-text-bright); }
   .tool-btn:active { transform: scale(0.96); }
-
   .tool-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
 
-  .tool-divider {
-    width: 1px; height: 24px;
-    background: var(--ui-border);
-    flex-shrink: 0;
-  }
+  .tool-divider { width: 1px; height: 24px; background: var(--ui-border); flex-shrink: 0; }
 
   /* ─── COLOR PICKER POPUP ─── */
   .color-picker-popup {
@@ -228,84 +214,73 @@
     animation: slideUp 0.2s ease;
   }
   .color-picker-popup.active { display: block; }
-  .theme-light .color-picker-popup {
-    background: rgba(255,255,255,0.97);
-    border-color: rgba(0,0,0,0.08);
-  }
+  .theme-light .color-picker-popup { background: rgba(255,255,255,0.97); border-color: rgba(0,0,0,0.08); }
 
   .color-section { margin-bottom: 14px; }
   .color-section:last-child { margin-bottom: 0; }
   .color-label {
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--ui-text);
-    margin-bottom: 8px;
+    font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--ui-text); margin-bottom: 8px;
   }
-  .color-swatches { display: flex; gap: 8px; }
+  .color-swatches { display: flex; gap: 8px; flex-wrap: wrap; }
   .swatch {
-    width: 32px; height: 32px;
-    border-radius: 50%;
-    border: 2px solid transparent;
-    cursor: pointer;
-    transition: all 0.15s;
-    position: relative;
+    width: 32px; height: 32px; border-radius: 50%;
+    border: 2px solid transparent; cursor: pointer;
+    transition: all 0.15s; position: relative;
   }
   .swatch:hover { transform: scale(1.15); }
   .swatch.active { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
 
   /* ─── TOAST ─── */
   #toast {
-    position: fixed;
-    top: 28px;
+    position: fixed; top: 28px;
     left: 50%; transform: translateX(-50%) translateY(-20px);
     padding: 12px 24px;
     background: var(--toast-bg);
     border: 1px solid var(--ui-border);
     border-radius: 12px;
-    font-size: 14px;
-    font-weight: 500;
+    font-size: 14px; font-weight: 500;
     color: var(--accent);
-    opacity: 0;
-    pointer-events: none;
+    opacity: 0; pointer-events: none;
     transition: opacity 0.25s, transform 0.25s;
-    z-index: 200;
-    backdrop-filter: blur(12px);
+    z-index: 200; backdrop-filter: blur(12px);
+    text-align: center; max-width: 90vw;
   }
-  #toast.show {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-  /* ─── FULLSCREEN TOGGLE ─── */
-  #fs-hint {
-    position: fixed;
-    top: 20px; right: 20px;
-    z-index: 50;
+  /* ─── OFFSCREEN CAPTURE ─── */
+  #capture-offscreen {
+    position: fixed; left: -99999px; top: -99999px;
+    pointer-events: none; z-index: -1;
   }
 
   /* ─── RESPONSIVE ─── */
   @media (max-width: 640px) {
-    #toolbar { flex-wrap: wrap; max-width: 92vw; justify-content: center; border-radius: 20px; }
+    #display-area { padding: 16px; }
+    #toolbar {
+      flex-wrap: wrap; max-width: 92vw; justify-content: center;
+      border-radius: 20px; bottom: 16px; gap: 2px; padding: 4px;
+    }
     .tool-btn span.label { display: none; }
     .tool-btn { padding: 10px 12px; }
-    #display-area { padding: 24px; }
     .input-card { padding: 24px; }
+    .color-picker-popup { bottom: 80px; width: 88vw; }
   }
 </style>
 </head>
 <body>
 
-<!-- Display Area (this is what gets screenshotted) -->
 <div id="display-area">
   <div id="big-text" class="placeholder">Tap to edit</div>
 </div>
 
-<!-- Input Overlay -->
+<div id="capture-offscreen"></div>
+
 <div id="input-overlay">
   <div class="input-card">
     <h2>Enter your text</h2>
+    <div class="input-hint">Enter for line breaks · Ctrl+Enter to display</div>
     <textarea id="text-input" placeholder="Type something big…" autofocus></textarea>
     <div class="input-actions">
       <button class="btn btn-ghost" id="btn-cancel">Cancel</button>
@@ -314,43 +289,37 @@
   </div>
 </div>
 
-<!-- Toolbar -->
 <div id="toolbar">
-  <!-- Edit -->
   <button class="tool-btn" id="tool-edit" title="Edit text">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
     <span class="label">Edit</span>
   </button>
   <div class="tool-divider"></div>
 
-  <!-- Color / Theme -->
   <button class="tool-btn" id="tool-color" title="Colors">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a7 7 0 000 14 3.5 3.5 0 013.5 3.5A3.5 3.5 0 0019 16a7 7 0 000-14"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/><circle cx="12" cy="7" r="1.5" fill="currentColor"/><circle cx="15.5" cy="8.5" r="1.5" fill="currentColor"/></svg>
     <span class="label">Theme</span>
   </button>
   <div class="tool-divider"></div>
 
-  <!-- Screenshot Download -->
   <button class="tool-btn" id="tool-download" title="Download screenshot">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
     <span class="label">Save</span>
   </button>
 
-  <!-- Copy Screenshot to Clipboard -->
-  <button class="tool-btn" id="tool-copy" title="Copy screenshot to clipboard">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-    <span class="label">Copy</span>
+  <button class="tool-btn" id="tool-copy" title="Copy / Share screenshot">
+    <svg id="copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+    <svg id="share-icon" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+    <span class="label" id="copy-label">Copy</span>
   </button>
   <div class="tool-divider"></div>
 
-  <!-- Fullscreen -->
   <button class="tool-btn" id="tool-fullscreen" title="Fullscreen">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
     <span class="label">Fullscreen</span>
   </button>
 </div>
 
-<!-- Color Picker Popup -->
 <div class="color-picker-popup" id="color-popup">
   <div class="color-section">
     <div class="color-label">Background</div>
@@ -362,48 +331,108 @@
   </div>
 </div>
 
-<!-- Toast -->
 <div id="toast"></div>
 
-<!-- html2canvas CDN -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <script>
-  // ─── ELEMENTS ───
-  const displayArea  = document.getElementById('display-area');
-  const bigText      = document.getElementById('big-text');
-  const overlay      = document.getElementById('input-overlay');
-  const textInput    = document.getElementById('text-input');
-  const btnCancel    = document.getElementById('btn-cancel');
-  const btnApply     = document.getElementById('btn-apply');
-  const toolbar      = document.getElementById('toolbar');
-  const toast        = document.getElementById('toast');
-  const colorPopup   = document.getElementById('color-popup');
+  const displayArea = document.getElementById('display-area');
+  const bigText = document.getElementById('big-text');
+  const overlay = document.getElementById('input-overlay');
+  const textInput = document.getElementById('text-input');
+  const btnCancel = document.getElementById('btn-cancel');
+  const btnApply = document.getElementById('btn-apply');
+  const toolbar = document.getElementById('toolbar');
+  const toastEl = document.getElementById('toast');
+  const colorPopup = document.getElementById('color-popup');
+  const captureOffscreen = document.getElementById('capture-offscreen');
 
   let currentText = '';
   let hideToolbarTimer = null;
 
-  // ─── TEXT SIZING ───
-  function autoSizeText() {
-    const container = displayArea;
-    const el = bigText;
-    const maxW = container.clientWidth - 80;
-    const maxH = container.clientHeight - 80;
+  // ─── DEVICE DETECTION ───
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-    let size = 800;
-    el.style.fontSize = size + 'px';
-
-    while ((el.scrollWidth > maxW || el.scrollHeight > maxH) && size > 16) {
-      size -= Math.max(2, Math.floor(size * 0.05));
-      el.style.fontSize = size + 'px';
-    }
+  if (isMobile) {
+    document.getElementById('copy-icon').style.display = 'none';
+    document.getElementById('share-icon').style.display = '';
+    document.getElementById('copy-label').textContent = 'Share';
   }
 
-  // ─── EDIT ───
+  // ─── TEXT SIZING (binary search — works well on narrow mobile portrait) ───
+  // Offscreen probe for measuring natural text dimensions
+  const probe = document.createElement('div');
+  probe.style.cssText = `
+    position:fixed; left:-99999px; top:-99999px;
+    visibility:hidden; pointer-events:none;
+    font-family:'Instrument Sans',sans-serif; font-weight:700;
+    line-height:1.08; white-space:pre-wrap;
+    display:inline-block;
+  `;
+  document.body.appendChild(probe);
+
+  function autoSizeText() {
+    const el = bigText;
+    const pad = isMobile ? 32 : 80;
+    const maxW = window.innerWidth - pad;
+    const maxH = window.innerHeight - pad;
+
+    // Copy content into probe (no width constraint → natural size)
+    probe.innerHTML = el.innerHTML || el.textContent;
+
+    // Helper: check if text fits at given font size
+    // For single-line text: measure unconstrained width
+    // For multi-line (has <br>): measure with maxW constraint for height
+    const hasBreaks = el.innerHTML.includes('<br>');
+
+    function fits(size) {
+      probe.style.fontSize = size + 'px';
+
+      if (hasBreaks) {
+        // Multi-line: constrain width, check height
+        probe.style.width = maxW + 'px';
+        probe.style.whiteSpace = 'pre-wrap';
+        probe.style.wordBreak = 'break-word';
+        const h = probe.scrollHeight;
+        // Also check each line doesn't overflow
+        probe.style.width = 'auto';
+        probe.style.whiteSpace = 'pre';
+        probe.style.wordBreak = 'normal';
+        const w = probe.scrollWidth;
+        return w <= maxW && h <= maxH;
+      } else {
+        // Single line: natural width must fit
+        probe.style.width = 'auto';
+        probe.style.whiteSpace = 'pre';
+        probe.style.wordBreak = 'normal';
+        const w = probe.scrollWidth;
+        const h = probe.scrollHeight;
+        return w <= maxW && h <= maxH;
+      }
+    }
+
+    let lo = 14, hi = 1200;
+
+    if (!fits(lo)) { el.style.fontSize = lo + 'px'; return; }
+
+    while (hi - lo > 1) {
+      const mid = Math.floor((lo + hi) / 2);
+      if (fits(mid)) lo = mid;
+      else hi = mid;
+    }
+
+    el.style.fontSize = lo + 'px';
+  }
+
+  // ─── EDITOR (line breaks fully supported) ───
   function openEditor() {
     textInput.value = currentText;
     overlay.classList.add('active');
-    setTimeout(() => textInput.focus(), 100);
+    setTimeout(() => {
+      textInput.focus();
+      textInput.setSelectionRange(textInput.value.length, textInput.value.length);
+    }, 120);
     colorPopup.classList.remove('active');
   }
 
@@ -415,7 +444,13 @@
     const t = textInput.value.trim();
     currentText = t;
     if (t) {
-      bigText.textContent = t;
+      // Build DOM with <br> for line breaks (safe — no innerHTML from user input)
+      bigText.innerHTML = '';
+      const lines = t.split('\n');
+      lines.forEach((line, i) => {
+        bigText.appendChild(document.createTextNode(line));
+        if (i < lines.length - 1) bigText.appendChild(document.createElement('br'));
+      });
       bigText.classList.remove('placeholder');
     } else {
       bigText.textContent = 'Tap to edit';
@@ -432,86 +467,175 @@
   document.getElementById('tool-edit').addEventListener('click', (e) => { e.stopPropagation(); openEditor(); });
   btnCancel.addEventListener('click', closeEditor);
   btnApply.addEventListener('click', applyText);
-  textInput.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); applyText(); }});
+
+  // Enter = newline (default textarea behavior), Ctrl/Cmd+Enter = display
+  textInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      applyText();
+    }
+  });
+
   overlay.addEventListener('click', (e) => { if (e.target === overlay) closeEditor(); });
 
   // ─── TOAST ───
+  let toastTimer = null;
   function showToast(msg) {
-    toast.textContent = msg;
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 2200);
+    clearTimeout(toastTimer);
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2400);
   }
 
-  // ─── SCREENSHOT HELPERS ───
+  // ─── SCREENSHOT CAPTURE ───
+  // Mobile: renders to offscreen 4:3 canvas for clean, shareable image
+  // Desktop: captures viewport as-is
+  let activeBg = '#000000';
+  let activeText = '#FFFFFF';
+
   async function captureCanvas() {
-    // Hide toolbar during capture
     toolbar.classList.add('hidden');
     colorPopup.classList.remove('active');
-    await new Promise(r => setTimeout(r, 100));
+    await new Promise(r => setTimeout(r, 120));
 
-    const canvas = await html2canvas(displayArea, {
-      backgroundColor: null,
-      scale: 2,
-      useCORS: true,
-      width: window.innerWidth,
-      height: window.innerHeight,
-    });
+    let canvas;
+
+    if (isMobile) {
+      // Offscreen 4:3 render
+      const W = 1200, H = 900;
+      const clone = document.createElement('div');
+      clone.style.cssText = `
+        width:${W}px; height:${H}px;
+        display:flex; align-items:center; justify-content:center;
+        background:${activeBg}; padding:60px; position:relative;
+      `;
+      const textClone = document.createElement('div');
+      textClone.style.cssText = `
+        max-width:100%; text-align:center;
+        font-family:'Instrument Sans',sans-serif; font-weight:700;
+        line-height:1.08; color:${activeText};
+        word-break:break-word; overflow-wrap:break-word; white-space:pre-wrap;
+      `;
+      textClone.innerHTML = bigText.innerHTML;
+      clone.appendChild(textClone);
+
+      captureOffscreen.innerHTML = '';
+      captureOffscreen.appendChild(clone);
+
+      // Size text inside clone using a probe (same approach as main autoSize)
+      const captureProbe = document.createElement('div');
+      captureProbe.style.cssText = `
+        position:fixed; left:-99999px; top:-99999px;
+        visibility:hidden; pointer-events:none;
+        font-family:'Instrument Sans',sans-serif; font-weight:700;
+        line-height:1.08; white-space:pre-wrap; display:inline-block;
+      `;
+      captureProbe.innerHTML = bigText.innerHTML;
+      document.body.appendChild(captureProbe);
+
+      const innerW = W - 120, innerH = H - 120;
+      const capHasBreaks = bigText.innerHTML.includes('<br>');
+      let lo = 16, hi = 500;
+
+      function capFits(size) {
+        captureProbe.style.fontSize = size + 'px';
+        if (capHasBreaks) {
+          captureProbe.style.width = innerW + 'px';
+          captureProbe.style.whiteSpace = 'pre-wrap';
+          captureProbe.style.wordBreak = 'break-word';
+          const h = captureProbe.scrollHeight;
+          captureProbe.style.width = 'auto';
+          captureProbe.style.whiteSpace = 'pre';
+          captureProbe.style.wordBreak = 'normal';
+          const w = captureProbe.scrollWidth;
+          return w <= innerW && h <= innerH;
+        } else {
+          captureProbe.style.width = 'auto';
+          captureProbe.style.whiteSpace = 'pre';
+          captureProbe.style.wordBreak = 'normal';
+          return captureProbe.scrollWidth <= innerW && captureProbe.scrollHeight <= innerH;
+        }
+      }
+
+      while (hi - lo > 1) {
+        const mid = Math.floor((lo + hi) / 2);
+        if (capFits(mid)) lo = mid; else hi = mid;
+      }
+      textClone.style.fontSize = lo + 'px';
+      document.body.removeChild(captureProbe);
+
+      canvas = await html2canvas(clone, { backgroundColor: null, scale: 2, width: W, height: H });
+      captureOffscreen.innerHTML = '';
+    } else {
+      canvas = await html2canvas(displayArea, {
+        backgroundColor: null, scale: 2, useCORS: true,
+        width: window.innerWidth, height: window.innerHeight,
+      });
+    }
 
     toolbar.classList.remove('hidden');
     return canvas;
   }
 
-  // ─── DOWNLOAD SCREENSHOT ───
+  // ─── DOWNLOAD ───
   document.getElementById('tool-download').addEventListener('click', async (e) => {
     e.stopPropagation();
     showToast('Capturing…');
     try {
       const canvas = await captureCanvas();
-      const link = document.createElement('a');
-      link.download = 'bigtext-' + Date.now() + '.png';
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-      showToast('Screenshot saved!');
-    } catch (err) {
-      showToast('Capture failed — try again');
-      console.error(err);
-    }
+      if (isMobile && navigator.share) {
+        canvas.toBlob(async (blob) => {
+          const file = new File([blob], 'bigtext.png', { type: 'image/png' });
+          try { await navigator.share({ files: [file] }); showToast('Done!'); }
+          catch { dlViaLink(canvas); }
+        }, 'image/png');
+      } else {
+        dlViaLink(canvas);
+      }
+    } catch (err) { showToast('Capture failed'); console.error(err); }
   });
 
-  // ─── COPY SCREENSHOT TO CLIPBOARD ───
+  function dlViaLink(canvas) {
+    const a = document.createElement('a');
+    a.download = 'bigtext-' + Date.now() + '.png';
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+    showToast('Screenshot saved!');
+  }
+
+  // ─── COPY / SHARE ───
   document.getElementById('tool-copy').addEventListener('click', async (e) => {
     e.stopPropagation();
-    showToast('Copying…');
+    showToast(isMobile ? 'Preparing…' : 'Copying…');
     try {
       const canvas = await captureCanvas();
-      canvas.toBlob(async (blob) => {
-        try {
-          await navigator.clipboard.write([
-            new ClipboardItem({ 'image/png': blob })
-          ]);
-          showToast('Copied to clipboard!');
-        } catch (err) {
-          showToast('Copy failed — browser may not support this');
-          console.error(err);
-        }
-      }, 'image/png');
-    } catch (err) {
-      showToast('Capture failed — try again');
-      console.error(err);
-    }
+      if (isMobile && navigator.share) {
+        // iOS doesn't support clipboard.write for images — use Share sheet instead
+        canvas.toBlob(async (blob) => {
+          const file = new File([blob], 'bigtext.png', { type: 'image/png' });
+          try { await navigator.share({ files: [file] }); showToast('Shared!'); }
+          catch (err) { if (err.name !== 'AbortError') showToast('Share cancelled'); }
+        }, 'image/png');
+      } else {
+        // Desktop: clipboard copy
+        canvas.toBlob(async (blob) => {
+          try {
+            await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+            showToast('Copied to clipboard!');
+          } catch { showToast('Copy failed — try Save instead'); }
+        }, 'image/png');
+      }
+    } catch (err) { showToast('Capture failed'); console.error(err); }
   });
 
   // ─── FULLSCREEN ───
   document.getElementById('tool-fullscreen').addEventListener('click', (e) => {
     e.stopPropagation();
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(() => {});
-    } else {
-      document.exitFullscreen();
-    }
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {});
+    else document.exitFullscreen();
   });
 
-  // ─── COLOR THEMES ───
+  // ─── COLORS ───
   const bgColors = [
     { color: '#000000', label: 'Black' },
     { color: '#FFFFFF', label: 'White' },
@@ -533,62 +657,45 @@
     { color: '#A78BFA', label: 'Violet' },
   ];
 
-  let activeBg = '#000000';
-  let activeText = '#FFFFFF';
-
   function renderSwatches() {
-    const bgContainer = document.getElementById('bg-swatches');
-    const textContainer = document.getElementById('text-swatches');
-    bgContainer.innerHTML = '';
-    textContainer.innerHTML = '';
+    const bgC = document.getElementById('bg-swatches');
+    const txC = document.getElementById('text-swatches');
+    bgC.innerHTML = ''; txC.innerHTML = '';
 
     bgColors.forEach(c => {
       const el = document.createElement('div');
       el.className = 'swatch' + (c.color === activeBg ? ' active' : '');
       el.style.background = c.color;
-      el.style.border = c.color === '#000000' ? '2px solid rgba(255,255,255,0.2)' : '';
+      if (c.color === '#000000') el.style.border = '2px solid rgba(255,255,255,0.2)';
       if (c.color === activeBg) el.style.borderColor = 'var(--accent)';
       el.title = c.label;
       el.addEventListener('click', () => { activeBg = c.color; applyColors(); renderSwatches(); });
-      bgContainer.appendChild(el);
+      bgC.appendChild(el);
     });
 
     textColors.forEach(c => {
       const el = document.createElement('div');
       el.className = 'swatch' + (c.color === activeText ? ' active' : '');
       el.style.background = c.color;
-      el.style.border = c.color === '#FFFFFF' ? '2px solid rgba(0,0,0,0.15)' : '';
+      if (c.color === '#FFFFFF') el.style.border = '2px solid rgba(0,0,0,0.15)';
       if (c.color === activeText) el.style.borderColor = 'var(--accent)';
       el.title = c.label;
       el.addEventListener('click', () => { activeText = c.color; applyColors(); renderSwatches(); });
-      textContainer.appendChild(el);
+      txC.appendChild(el);
     });
   }
 
   function applyColors() {
     displayArea.style.background = activeBg;
     bigText.style.color = activeText;
-
-    // Switch to light UI theme if background is bright
     const r = parseInt(activeBg.slice(1,3),16), g = parseInt(activeBg.slice(3,5),16), b = parseInt(activeBg.slice(5,7),16);
-    const lum = (0.299*r + 0.587*g + 0.114*b);
-    if (lum > 160) {
-      document.body.classList.add('theme-light');
-    } else {
-      document.body.classList.remove('theme-light');
-    }
+    if ((0.299*r + 0.587*g + 0.114*b) > 160) document.body.classList.add('theme-light');
+    else document.body.classList.remove('theme-light');
   }
 
-  document.getElementById('tool-color').addEventListener('click', (e) => {
-    e.stopPropagation();
-    colorPopup.classList.toggle('active');
-  });
-
-  // Close color popup on outside click
+  document.getElementById('tool-color').addEventListener('click', (e) => { e.stopPropagation(); colorPopup.classList.toggle('active'); });
   document.addEventListener('click', (e) => {
-    if (!e.target.closest('#color-popup') && !e.target.closest('#tool-color')) {
-      colorPopup.classList.remove('active');
-    }
+    if (!e.target.closest('#color-popup') && !e.target.closest('#tool-color')) colorPopup.classList.remove('active');
   });
 
   // ─── AUTO-HIDE TOOLBAR ───
@@ -596,12 +703,10 @@
     toolbar.classList.remove('hidden');
     clearTimeout(hideToolbarTimer);
     hideToolbarTimer = setTimeout(() => {
-      if (!colorPopup.classList.contains('active') && !overlay.classList.contains('active')) {
+      if (!colorPopup.classList.contains('active') && !overlay.classList.contains('active'))
         toolbar.classList.add('hidden');
-      }
     }, 4000);
   }
-
   document.addEventListener('mousemove', resetToolbarTimer);
   document.addEventListener('touchstart', resetToolbarTimer);
   toolbar.addEventListener('mouseenter', () => { clearTimeout(hideToolbarTimer); toolbar.classList.remove('hidden'); });
@@ -610,6 +715,7 @@
   renderSwatches();
   autoSizeText();
   window.addEventListener('resize', autoSizeText);
+  window.addEventListener('orientationchange', () => setTimeout(autoSizeText, 250));
   resetToolbarTimer();
 </script>
 </body>
