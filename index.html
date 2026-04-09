@@ -159,6 +159,21 @@
   .btn-primary { background: var(--accent); color: #000; }
   .btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); }
 
+  .btn-caps {
+    background: var(--ui-bg);
+    color: var(--ui-text);
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    padding: 7px 14px;
+    border-radius: 8px;
+    transition: all 0.15s ease;
+  }
+  .btn-caps:hover { background: var(--ui-bg-hover); color: var(--ui-text-bright); }
+  .btn-caps.active {
+    background: var(--accent-dim);
+    color: var(--accent);
+  }
+
   /* ─── TOOLBAR ─── */
   #toolbar {
     position: fixed;
@@ -283,6 +298,11 @@
     <div class="input-hint">Enter for line breaks · Ctrl+Enter to display</div>
     <textarea id="text-input" placeholder="Type something big…" autofocus></textarea>
     <div class="input-actions">
+      <button class="btn btn-caps" id="btn-caps" title="Toggle ALL CAPS">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M3 20h4l10-10a2.83 2.83 0 00-4-4L3 16v4z"/></svg>
+        ALL CAPS
+      </button>
+      <span style="flex:1"></span>
       <button class="btn btn-ghost" id="btn-cancel">Cancel</button>
       <button class="btn btn-primary" id="btn-apply">Display</button>
     </div>
@@ -428,6 +448,8 @@
   // ─── EDITOR (line breaks fully supported) ───
   function openEditor() {
     textInput.value = currentText;
+    textInput.style.textTransform = capsOn ? 'uppercase' : 'none';
+    btnCaps.classList.toggle('active', capsOn);
     overlay.classList.add('active');
     setTimeout(() => {
       textInput.focus();
@@ -441,7 +463,8 @@
   }
 
   function applyText() {
-    const t = textInput.value.trim();
+    let t = textInput.value.trim();
+    if (capsOn) t = t.toUpperCase();
     currentText = t;
     if (t) {
       // Build DOM with <br> for line breaks (safe — no innerHTML from user input)
@@ -467,6 +490,21 @@
   document.getElementById('tool-edit').addEventListener('click', (e) => { e.stopPropagation(); openEditor(); });
   btnCancel.addEventListener('click', closeEditor);
   btnApply.addEventListener('click', applyText);
+
+  // ALL CAPS toggle
+  let capsOn = false;
+  const btnCaps = document.getElementById('btn-caps');
+  btnCaps.addEventListener('click', () => {
+    capsOn = !capsOn;
+    btnCaps.classList.toggle('active', capsOn);
+    if (capsOn) {
+      textInput.value = textInput.value.toUpperCase();
+      textInput.style.textTransform = 'uppercase';
+    } else {
+      textInput.style.textTransform = 'none';
+    }
+    textInput.focus();
+  });
 
   // Enter = newline (default textarea behavior), Ctrl/Cmd+Enter = display
   textInput.addEventListener('keydown', (e) => {
