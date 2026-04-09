@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BigText — Large Text Display</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Instrument+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #000000;
+    --text: #FFFFFF;
+    --ui-bg: rgba(255,255,255,0.06);
+    --ui-bg-hover: rgba(255,255,255,0.12);
+    --ui-border: rgba(255,255,255,0.1);
+    --ui-text: rgba(255,255,255,0.7);
+    --ui-text-bright: #FFFFFF;
+    --accent: #6EE7B7;
+    --accent-dim: rgba(110,231,183,0.15);
+    --toast-bg: rgba(20,20,20,0.95);
+    --font-body: 'DM Sans', sans-serif;
+    --font-display: 'Instrument Sans', sans-serif;
+  }
+
+  .theme-light {
+    --bg: #F5F0EB;
+    --text: #1A1A1A;
+    --ui-bg: rgba(0,0,0,0.05);
+    --ui-bg-hover: rgba(0,0,0,0.1);
+    --ui-border: rgba(0,0,0,0.1);
+    --ui-text: rgba(0,0,0,0.5);
+    --ui-text-bright: #1A1A1A;
+    --accent: #10B981;
+    --accent-dim: rgba(16,185,129,0.12);
+    --toast-bg: rgba(240,240,240,0.95);
+  }
+
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    transition: background 0.4s ease, color 0.4s ease;
+  }
+
+  /* ─── DISPLAY AREA ─── */
+  #display-area {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    padding: 40px;
+    background: var(--bg);
+    transition: background 0.4s ease;
+    cursor: text;
+    z-index: 1;
+  }
+
+  #big-text {
+    width: 100%;
+    text-align: center;
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--text);
+    word-break: break-word;
+    overflow-wrap: break-word;
+    transition: color 0.4s ease;
+    user-select: none;
+  }
+
+  #big-text.placeholder {
+    opacity: 0.15;
+  }
+
+  /* ─── INPUT OVERLAY ─── */
+  #input-overlay {
+    position: fixed; inset: 0;
+    display: none;
+    align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    z-index: 100;
+    animation: fadeIn 0.2s ease;
+  }
+  #input-overlay.active { display: flex; }
+
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .input-card {
+    background: rgba(30,30,30,0.95);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 36px;
+    width: 90%;
+    max-width: 560px;
+    animation: slideUp 0.3s ease;
+  }
+
+  .theme-light .input-card {
+    background: rgba(255,255,255,0.97);
+    border-color: rgba(0,0,0,0.08);
+  }
+
+  .input-card h2 {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ui-text-bright);
+    margin-bottom: 18px;
+    letter-spacing: -0.02em;
+  }
+
+  .input-card textarea {
+    width: 100%;
+    height: 120px;
+    background: var(--ui-bg);
+    border: 1.5px solid var(--ui-border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-family: var(--font-body);
+    font-size: 16px;
+    color: var(--ui-text-bright);
+    resize: none;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .input-card textarea:focus {
+    border-color: var(--accent);
+  }
+  .input-card textarea::placeholder {
+    color: var(--ui-text);
+  }
+
+  .input-actions {
+    display: flex; gap: 10px;
+    margin-top: 16px;
+    justify-content: flex-end;
+  }
+
+  .btn {
+    padding: 10px 22px;
+    border-radius: 10px;
+    border: none;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .btn-ghost {
+    background: var(--ui-bg);
+    color: var(--ui-text);
+  }
+  .btn-ghost:hover { background: var(--ui-bg-hover); color: var(--ui-text-bright); }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #000;
+  }
+  .btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); }
+
+  /* ─── TOOLBAR ─── */
+  #toolbar {
+    position: fixed;
+    bottom: 28px;
+    left: 50%; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px;
+    background: var(--ui-bg);
+    border: 1px solid var(--ui-border);
+    border-radius: 16px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    z-index: 50;
+    transition: opacity 0.3s, transform 0.3s;
+  }
+
+  #toolbar.hidden {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+    pointer-events: none;
+  }
+
+  .tool-btn {
+    display: flex; align-items: center; justify-content: center; gap: 7px;
+    padding: 10px 16px;
+    background: transparent;
+    border: none;
+    border-radius: 11px;
+    color: var(--ui-text);
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+  .tool-btn:hover { background: var(--ui-bg-hover); color: var(--ui-text-bright); }
+  .tool-btn:active { transform: scale(0.96); }
+
+  .tool-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+  .tool-divider {
+    width: 1px; height: 24px;
+    background: var(--ui-border);
+    flex-shrink: 0;
+  }
+
+  /* ─── COLOR PICKER POPUP ─── */
+  .color-picker-popup {
+    position: fixed;
+    bottom: 90px;
+    left: 50%; transform: translateX(-50%);
+    display: none;
+    background: rgba(30,30,30,0.97);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 18px;
+    z-index: 60;
+    animation: slideUp 0.2s ease;
+  }
+  .color-picker-popup.active { display: block; }
+  .theme-light .color-picker-popup {
+    background: rgba(255,255,255,0.97);
+    border-color: rgba(0,0,0,0.08);
+  }
+
+  .color-section { margin-bottom: 14px; }
+  .color-section:last-child { margin-bottom: 0; }
+  .color-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ui-text);
+    margin-bottom: 8px;
+  }
+  .color-swatches { display: flex; gap: 8px; }
+  .swatch {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+  }
+  .swatch:hover { transform: scale(1.15); }
+  .swatch.active { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+
+  /* ─── TOAST ─── */
+  #toast {
+    position: fixed;
+    top: 28px;
+    left: 50%; transform: translateX(-50%) translateY(-20px);
+    padding: 12px 24px;
+    background: var(--toast-bg);
+    border: 1px solid var(--ui-border);
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--accent);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s, transform 0.25s;
+    z-index: 200;
+    backdrop-filter: blur(12px);
+  }
+  #toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* ─── FULLSCREEN TOGGLE ─── */
+  #fs-hint {
+    position: fixed;
+    top: 20px; right: 20px;
+    z-index: 50;
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 640px) {
+    #toolbar { flex-wrap: wrap; max-width: 92vw; justify-content: center; border-radius: 20px; }
+    .tool-btn span.label { display: none; }
+    .tool-btn { padding: 10px 12px; }
+    #display-area { padding: 24px; }
+    .input-card { padding: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Display Area (this is what gets screenshotted) -->
+<div id="display-area">
+  <div id="big-text" class="placeholder">Tap to edit</div>
+</div>
+
+<!-- Input Overlay -->
+<div id="input-overlay">
+  <div class="input-card">
+    <h2>Enter your text</h2>
+    <textarea id="text-input" placeholder="Type something big…" autofocus></textarea>
+    <div class="input-actions">
+      <button class="btn btn-ghost" id="btn-cancel">Cancel</button>
+      <button class="btn btn-primary" id="btn-apply">Display</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toolbar -->
+<div id="toolbar">
+  <!-- Edit -->
+  <button class="tool-btn" id="tool-edit" title="Edit text">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+    <span class="label">Edit</span>
+  </button>
+  <div class="tool-divider"></div>
+
+  <!-- Color / Theme -->
+  <button class="tool-btn" id="tool-color" title="Colors">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a7 7 0 000 14 3.5 3.5 0 013.5 3.5A3.5 3.5 0 0019 16a7 7 0 000-14"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/><circle cx="12" cy="7" r="1.5" fill="currentColor"/><circle cx="15.5" cy="8.5" r="1.5" fill="currentColor"/></svg>
+    <span class="label">Theme</span>
+  </button>
+  <div class="tool-divider"></div>
+
+  <!-- Screenshot Download -->
+  <button class="tool-btn" id="tool-download" title="Download screenshot">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    <span class="label">Save</span>
+  </button>
+
+  <!-- Copy Screenshot to Clipboard -->
+  <button class="tool-btn" id="tool-copy" title="Copy screenshot to clipboard">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+    <span class="label">Copy</span>
+  </button>
+  <div class="tool-divider"></div>
+
+  <!-- Fullscreen -->
+  <button class="tool-btn" id="tool-fullscreen" title="Fullscreen">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+    <span class="label">Fullscreen</span>
+  </button>
+</div>
+
+<!-- Color Picker Popup -->
+<div class="color-picker-popup" id="color-popup">
+  <div class="color-section">
+    <div class="color-label">Background</div>
+    <div class="color-swatches" id="bg-swatches"></div>
+  </div>
+  <div class="color-section">
+    <div class="color-label">Text</div>
+    <div class="color-swatches" id="text-swatches"></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- html2canvas CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<script>
+  // ─── ELEMENTS ───
+  const displayArea  = document.getElementById('display-area');
+  const bigText      = document.getElementById('big-text');
+  const overlay      = document.getElementById('input-overlay');
+  const textInput    = document.getElementById('text-input');
+  const btnCancel    = document.getElementById('btn-cancel');
+  const btnApply     = document.getElementById('btn-apply');
+  const toolbar      = document.getElementById('toolbar');
+  const toast        = document.getElementById('toast');
+  const colorPopup   = document.getElementById('color-popup');
+
+  let currentText = '';
+  let hideToolbarTimer = null;
+
+  // ─── TEXT SIZING ───
+  function autoSizeText() {
+    const container = displayArea;
+    const el = bigText;
+    const maxW = container.clientWidth - 80;
+    const maxH = container.clientHeight - 80;
+
+    let size = 800;
+    el.style.fontSize = size + 'px';
+
+    while ((el.scrollWidth > maxW || el.scrollHeight > maxH) && size > 16) {
+      size -= Math.max(2, Math.floor(size * 0.05));
+      el.style.fontSize = size + 'px';
+    }
+  }
+
+  // ─── EDIT ───
+  function openEditor() {
+    textInput.value = currentText;
+    overlay.classList.add('active');
+    setTimeout(() => textInput.focus(), 100);
+    colorPopup.classList.remove('active');
+  }
+
+  function closeEditor() {
+    overlay.classList.remove('active');
+  }
+
+  function applyText() {
+    const t = textInput.value.trim();
+    currentText = t;
+    if (t) {
+      bigText.textContent = t;
+      bigText.classList.remove('placeholder');
+    } else {
+      bigText.textContent = 'Tap to edit';
+      bigText.classList.add('placeholder');
+    }
+    closeEditor();
+    autoSizeText();
+  }
+
+  displayArea.addEventListener('click', (e) => {
+    if (e.target.closest('#toolbar') || e.target.closest('.color-picker-popup')) return;
+    openEditor();
+  });
+  document.getElementById('tool-edit').addEventListener('click', (e) => { e.stopPropagation(); openEditor(); });
+  btnCancel.addEventListener('click', closeEditor);
+  btnApply.addEventListener('click', applyText);
+  textInput.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); applyText(); }});
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) closeEditor(); });
+
+  // ─── TOAST ───
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2200);
+  }
+
+  // ─── SCREENSHOT HELPERS ───
+  async function captureCanvas() {
+    // Hide toolbar during capture
+    toolbar.classList.add('hidden');
+    colorPopup.classList.remove('active');
+    await new Promise(r => setTimeout(r, 100));
+
+    const canvas = await html2canvas(displayArea, {
+      backgroundColor: null,
+      scale: 2,
+      useCORS: true,
+      width: window.innerWidth,
+      height: window.innerHeight,
+    });
+
+    toolbar.classList.remove('hidden');
+    return canvas;
+  }
+
+  // ─── DOWNLOAD SCREENSHOT ───
+  document.getElementById('tool-download').addEventListener('click', async (e) => {
+    e.stopPropagation();
+    showToast('Capturing…');
+    try {
+      const canvas = await captureCanvas();
+      const link = document.createElement('a');
+      link.download = 'bigtext-' + Date.now() + '.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      showToast('Screenshot saved!');
+    } catch (err) {
+      showToast('Capture failed — try again');
+      console.error(err);
+    }
+  });
+
+  // ─── COPY SCREENSHOT TO CLIPBOARD ───
+  document.getElementById('tool-copy').addEventListener('click', async (e) => {
+    e.stopPropagation();
+    showToast('Copying…');
+    try {
+      const canvas = await captureCanvas();
+      canvas.toBlob(async (blob) => {
+        try {
+          await navigator.clipboard.write([
+            new ClipboardItem({ 'image/png': blob })
+          ]);
+          showToast('Copied to clipboard!');
+        } catch (err) {
+          showToast('Copy failed — browser may not support this');
+          console.error(err);
+        }
+      }, 'image/png');
+    } catch (err) {
+      showToast('Capture failed — try again');
+      console.error(err);
+    }
+  });
+
+  // ─── FULLSCREEN ───
+  document.getElementById('tool-fullscreen').addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+      document.exitFullscreen();
+    }
+  });
+
+  // ─── COLOR THEMES ───
+  const bgColors = [
+    { color: '#000000', label: 'Black' },
+    { color: '#FFFFFF', label: 'White' },
+    { color: '#1A1A2E', label: 'Navy' },
+    { color: '#0D1B2A', label: 'Deep Blue' },
+    { color: '#1B4332', label: 'Forest' },
+    { color: '#7F1D1D', label: 'Wine' },
+    { color: '#F59E0B', label: 'Amber' },
+    { color: '#6D28D9', label: 'Purple' },
+  ];
+  const textColors = [
+    { color: '#FFFFFF', label: 'White' },
+    { color: '#000000', label: 'Black' },
+    { color: '#F87171', label: 'Red' },
+    { color: '#60A5FA', label: 'Blue' },
+    { color: '#34D399', label: 'Green' },
+    { color: '#FBBF24', label: 'Yellow' },
+    { color: '#F472B6', label: 'Pink' },
+    { color: '#A78BFA', label: 'Violet' },
+  ];
+
+  let activeBg = '#000000';
+  let activeText = '#FFFFFF';
+
+  function renderSwatches() {
+    const bgContainer = document.getElementById('bg-swatches');
+    const textContainer = document.getElementById('text-swatches');
+    bgContainer.innerHTML = '';
+    textContainer.innerHTML = '';
+
+    bgColors.forEach(c => {
+      const el = document.createElement('div');
+      el.className = 'swatch' + (c.color === activeBg ? ' active' : '');
+      el.style.background = c.color;
+      el.style.border = c.color === '#000000' ? '2px solid rgba(255,255,255,0.2)' : '';
+      if (c.color === activeBg) el.style.borderColor = 'var(--accent)';
+      el.title = c.label;
+      el.addEventListener('click', () => { activeBg = c.color; applyColors(); renderSwatches(); });
+      bgContainer.appendChild(el);
+    });
+
+    textColors.forEach(c => {
+      const el = document.createElement('div');
+      el.className = 'swatch' + (c.color === activeText ? ' active' : '');
+      el.style.background = c.color;
+      el.style.border = c.color === '#FFFFFF' ? '2px solid rgba(0,0,0,0.15)' : '';
+      if (c.color === activeText) el.style.borderColor = 'var(--accent)';
+      el.title = c.label;
+      el.addEventListener('click', () => { activeText = c.color; applyColors(); renderSwatches(); });
+      textContainer.appendChild(el);
+    });
+  }
+
+  function applyColors() {
+    displayArea.style.background = activeBg;
+    bigText.style.color = activeText;
+
+    // Switch to light UI theme if background is bright
+    const r = parseInt(activeBg.slice(1,3),16), g = parseInt(activeBg.slice(3,5),16), b = parseInt(activeBg.slice(5,7),16);
+    const lum = (0.299*r + 0.587*g + 0.114*b);
+    if (lum > 160) {
+      document.body.classList.add('theme-light');
+    } else {
+      document.body.classList.remove('theme-light');
+    }
+  }
+
+  document.getElementById('tool-color').addEventListener('click', (e) => {
+    e.stopPropagation();
+    colorPopup.classList.toggle('active');
+  });
+
+  // Close color popup on outside click
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('#color-popup') && !e.target.closest('#tool-color')) {
+      colorPopup.classList.remove('active');
+    }
+  });
+
+  // ─── AUTO-HIDE TOOLBAR ───
+  function resetToolbarTimer() {
+    toolbar.classList.remove('hidden');
+    clearTimeout(hideToolbarTimer);
+    hideToolbarTimer = setTimeout(() => {
+      if (!colorPopup.classList.contains('active') && !overlay.classList.contains('active')) {
+        toolbar.classList.add('hidden');
+      }
+    }, 4000);
+  }
+
+  document.addEventListener('mousemove', resetToolbarTimer);
+  document.addEventListener('touchstart', resetToolbarTimer);
+  toolbar.addEventListener('mouseenter', () => { clearTimeout(hideToolbarTimer); toolbar.classList.remove('hidden'); });
+
+  // ─── INIT ───
+  renderSwatches();
+  autoSizeText();
+  window.addEventListener('resize', autoSizeText);
+  resetToolbarTimer();
+</script>
+</body>
+</html>
