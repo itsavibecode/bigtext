@@ -4,6 +4,31 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>BigText — Large Text Display</title>
+<meta name="description" content="Display anything, big. A fullscreen large-text tool with theme picker, screenshot export, copy-to-clipboard, share, and ALL CAPS toggle.">
+<meta name="version" content="0.1.0">
+<meta name="theme-color" content="#000000">
+<link rel="canonical" href="https://itsavibecode.github.io/bigtext/">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="BigText">
+<meta property="og:title" content="BigText — Large Text Display">
+<meta property="og:description" content="Display anything, big. Fullscreen text with theme picker, screenshot export, copy/share, and ALL CAPS toggle.">
+<meta property="og:url" content="https://itsavibecode.github.io/bigtext/">
+<meta property="og:image" content="https://itsavibecode.github.io/bigtext/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="BigText — Display anything, big.">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="BigText — Large Text Display">
+<meta name="twitter:description" content="Display anything, big. Fullscreen text with theme picker, screenshot export, copy/share, and ALL CAPS toggle.">
+<meta name="twitter:image" content="https://itsavibecode.github.io/bigtext/og-image.png">
+<meta name="twitter:image:alt" content="BigText — Display anything, big.">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Instrument+Sans:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -356,6 +381,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <script>
+  const APP_VERSION = '0.1.0';
   const displayArea = document.getElementById('display-area');
   const bigText = document.getElementById('big-text');
   const overlay = document.getElementById('input-overlay');
