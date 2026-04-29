@@ -25,6 +25,12 @@ Display anything, big. A single-file fullscreen large-text tool with a theme pic
 
 ## Changelog
 
+### v0.1.1 — 2026-04-29
+- Full classic favicon coverage so older browsers, embed scrapers, and the default `GET /favicon.ico` request all hit a real file instead of a 404
+- Add multi-resolution `favicon.ico` (16/32/48), standalone `favicon-16x16.png` and `favicon-32x32.png`
+- Add PWA web manifest (`site.webmanifest`) with 192px + 512px icons and a maskable variant — Android users can now "Install" BigText to their home screen as a standalone app
+- Bump APP_VERSION to 0.1.1 (source constant + meta tag)
+
 ### v0.1.0 — 2026-04-29
 - Bring repo into local workflow and tag the first versioned release
 - Add Open Graph and Twitter Card meta tags so links render previews in Slack, iMessage, Discord, Twitter, etc.
