@@ -25,6 +25,14 @@ Display anything, big. A single-file fullscreen large-text tool with a theme pic
 
 ## Changelog
 
+### v0.1.2 — 2026-04-29
+- Performance pass — kill render-blocking and trim wasted bytes on initial load
+- **Lazy-load html2canvas (~50 KB) on first capture click** instead of on page load. Removes a render-blocking external script from the critical path. After idle, the lib is opportunistically prefetched via `requestIdleCallback` so the first Save / Copy still feels instant.
+- **Make Google Fonts CSS non-blocking** with the `media="print" onload` swap pattern + `<noscript>` fallback. First paint no longer waits on Google's CDN.
+- Add `preconnect` to `fonts.gstatic.com` (with `crossorigin`) so the font-file handshake starts in parallel with the CSS fetch.
+- Drop unused `Instrument Sans wght@400` from the Google Fonts request — only weight 700 is used for the display text.
+- Bump APP_VERSION to 0.1.2.
+
 ### v0.1.1 — 2026-04-29
 - Full classic favicon coverage so older browsers, embed scrapers, and the default `GET /favicon.ico` request all hit a real file instead of a 404
 - Add multi-resolution `favicon.ico` (16/32/48), standalone `favicon-16x16.png` and `favicon-32x32.png`

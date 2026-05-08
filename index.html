@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>BigText — Large Text Display</title>
 <meta name="description" content="Display anything, big. A fullscreen large-text tool with theme picker, screenshot export, copy-to-clipboard, share, and ALL CAPS toggle.">
-<meta name="version" content="0.1.1">
+<meta name="version" content="0.1.2">
 <meta name="theme-color" content="#000000">
 <link rel="canonical" href="https://itsavibecode.github.io/bigtext/">
 <link rel="icon" type="image/x-icon" href="favicon.ico" sizes="any">
@@ -34,7 +34,9 @@
 <meta name="twitter:image:alt" content="BigText — Display anything, big.">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Instrument+Sans:wght@400;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Instrument+Sans:wght@700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Instrument+Sans:wght@700&display=swap"></noscript>
 <style>
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -382,10 +384,33 @@
 
 <div id="toast"></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
 <script>
-  const APP_VERSION = '0.1.1';
+  const APP_VERSION = '0.1.2';
+
+  // Lazy-load html2canvas only when the user actually triggers a capture.
+  // Saves ~50KB and a render-blocking request on initial page load.
+  let _html2canvasPromise = null;
+  function ensureHtml2Canvas() {
+    if (window.html2canvas) return Promise.resolve();
+    if (_html2canvasPromise) return _html2canvasPromise;
+    _html2canvasPromise = new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+      s.onload = () => resolve();
+      s.onerror = () => { _html2canvasPromise = null; reject(new Error('html2canvas failed to load')); };
+      document.head.appendChild(s);
+    });
+    return _html2canvasPromise;
+  }
+
+  // After initial render + idle, opportunistically prefetch html2canvas so the
+  // first Save / Copy click feels instant.
+  const _idlePrefetch = () => { ensureHtml2Canvas().catch(() => {}); };
+  if ('requestIdleCallback' in window) {
+    requestIdleCallback(_idlePrefetch, { timeout: 4000 });
+  } else {
+    setTimeout(_idlePrefetch, 2500);
+  }
   const displayArea = document.getElementById('display-area');
   const bigText = document.getElementById('big-text');
   const overlay = document.getElementById('input-overlay');
@@ -562,6 +587,11 @@
   let activeText = '#FFFFFF';
 
   async function captureCanvas() {
+    // Make sure html2canvas is loaded before we touch the toolbar — keeps the
+    // toolbar visible if the lazy-load fails so the user can retry.
+    try { await ensureHtml2Canvas(); }
+    catch (e) { showToast('Couldn’t load capture library'); throw e; }
+
     toolbar.classList.add('hidden');
     colorPopup.classList.remove('active');
     await new Promise(r => setTimeout(r, 120));
