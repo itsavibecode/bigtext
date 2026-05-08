@@ -25,6 +25,11 @@ Display anything, big. A single-file fullscreen large-text tool with a theme pic
 
 ## Changelog
 
+### v0.1.4 — 2026-04-29
+- v0.1.3 only got mobile a11y to 100 — desktop PSI still flunked color-contrast because at desktop sizes the placeholder renders at ~255px, and 0.3 opacity (#4D4D4D vs #000) computes to 2.48:1, just below WCAG's 3:1 large-text threshold
+- Bump placeholder opacity to 0.4 → ~3.6:1 contrast, comfortably passing
+- Bump APP_VERSION to 0.1.4
+
 ### v0.1.3 — 2026-04-29
 - Accessibility pass driven by Lighthouse audit results
 - **Fix `color-contrast`** — bump "Tap to edit" placeholder opacity from 0.15 to 0.3 so the text on black computes to ~4.2:1 contrast (passes WCAG AA for large text). Still reads as a placeholder visually.
