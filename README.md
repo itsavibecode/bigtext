@@ -25,6 +25,12 @@ Display anything, big. A single-file fullscreen large-text tool with a theme pic
 
 ## Changelog
 
+### v0.1.3 — 2026-04-29
+- Accessibility pass driven by Lighthouse audit results
+- **Fix `color-contrast`** — bump "Tap to edit" placeholder opacity from 0.15 to 0.3 so the text on black computes to ~4.2:1 contrast (passes WCAG AA for large text). Still reads as a placeholder visually.
+- **Fix `meta-viewport`** — drop `maximum-scale=1.0` and `user-scalable=no` so users with low vision can pinch-zoom. Textarea font-size is already 16px so iOS won't auto-zoom on focus.
+- Bump APP_VERSION to 0.1.3.
+
 ### v0.1.2 — 2026-04-29
 - Performance pass — kill render-blocking and trim wasted bytes on initial load
 - **Lazy-load html2canvas (~50 KB) on first capture click** instead of on page load. Removes a render-blocking external script from the critical path. After idle, the lib is opportunistically prefetched via `requestIdleCallback` so the first Save / Copy still feels instant.
